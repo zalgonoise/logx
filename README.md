@@ -167,7 +167,7 @@ type Record interface {
 
 ### Attribute
 
-An attribute is a simple interface that exposes getter and setter methods for an attribute, which can be of any type. Note that an attribute is an immutable entity.
+An attribute is a simple interface that exposes getter and setter methods for an attribute, a key-value pair where the key is `string` and value is `any`. Note that an attribute is an immutable entity.
 
 ```go
 // Attr interface describes the behavior that a serializable attribute
