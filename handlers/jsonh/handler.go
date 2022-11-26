@@ -98,6 +98,9 @@ func (h jsonHandler) asMap(attrs []attr.Attr) map[string]interface{} {
 			out[a.Key()] = h.asMap(v)
 			continue
 		}
+		if v, ok := (a.Value()).(attr.Attr); ok {
+			out[a.Key()] = h.asMap([]attr.Attr{v})
+		}
 		out[a.Key()] = a.Value()
 	}
 	return out
