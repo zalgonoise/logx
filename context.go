@@ -1,6 +1,10 @@
 package logx
 
-import "context"
+import (
+	"context"
+
+	"github.com/zalgonoise/logx/handlers"
+)
 
 // CtxLoggerKey is a custom type to define context keys for this
 // library's logger
@@ -13,7 +17,8 @@ const StandardCtxKey CtxLoggerKey = "logger"
 // Logger `logger` as a value (identified by `StandardCtxKey`)
 func InContext(ctx context.Context, logger Logger) context.Context {
 	if ctx == nil || logger == nil {
-		return nil
+		// context logger exists but doesn't do anything
+		return context.WithValue(ctx, StandardCtxKey, New(handlers.Unimpl()))
 	}
 	return context.WithValue(ctx, StandardCtxKey, logger)
 }
@@ -25,5 +30,7 @@ func From(ctx context.Context) Logger {
 	if l, ok := v.(Logger); ok {
 		return l
 	}
-	return nil
+
+	// return logger from context but doesn't do anything
+	return New(handlers.Unimpl())
 }

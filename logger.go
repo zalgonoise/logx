@@ -37,7 +37,7 @@ type logger struct {
 // New spawns a new logger based on the handler `h`
 func New(h handlers.Handler) Logger {
 	if h == nil {
-		return nil
+		h = handlers.Unimpl()
 	}
 	return &logger{
 		h: h,
