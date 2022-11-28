@@ -94,6 +94,7 @@ func (h textHandler) Handle(r records.Record) error {
 		b.WriteRune(h.conf.whitespace)
 		b.WriteRune(h.conf.wrapperR)
 	}
+	b.WriteByte(10) // newline
 
 	n, err := h.w.Write(b.Bytes())
 	if err != nil {
