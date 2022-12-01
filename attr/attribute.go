@@ -72,11 +72,11 @@ func (a attr[T]) WithValue(value any) Attr {
 	return New(a.key, v)
 }
 
-// NewPtr is a generic function to create an Attr from a pointer value
+// Ptr is a generic function to create an Attr from a pointer value
 //
 // Using a generic approach allows the Attr.WithValue method to be
 // scoped with certain constraints for specific applications
-func NewPtr[T any](key string, value *T) Attr {
+func Ptr[T any](key string, value *T) Attr {
 	if key == "" {
 		return nil
 	}
@@ -106,7 +106,7 @@ func (p *ptrAttr[T]) Value() any {
 
 // WithKey returns a copy of this Attr, with key `key`
 func (p *ptrAttr[T]) WithKey(key string) Attr {
-	return NewPtr(key, p.ptr)
+	return Ptr(key, p.ptr)
 }
 
 // WithValue returns a copy of this Attr, with value `value`
@@ -122,5 +122,5 @@ func (p *ptrAttr[T]) WithValue(value any) Attr {
 	if !ok {
 		return nil
 	}
-	return NewPtr(p.key, v)
+	return Ptr(p.key, v)
 }

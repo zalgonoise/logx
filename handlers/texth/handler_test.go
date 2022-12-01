@@ -30,8 +30,8 @@ var (
 	taNest = attr.New("namespace", []attr.Attr{
 		ta3, ta4,
 	})
-	ta6      = attr.NewPtr("f_string_pointer", &testMsg)
-	ta6unset = attr.NewPtr("g_string_pointer_nil", testNilString)
+	ta6      = attr.Ptr("f_string_pointer", &testMsg)
+	ta6unset = attr.Ptr("g_string_pointer_nil", testNilString)
 
 	testAttrs = []attr.Attr{
 		ta1, ta2, ta3, ta4,
