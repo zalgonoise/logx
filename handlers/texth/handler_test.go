@@ -11,9 +11,10 @@ import (
 )
 
 var (
-	testTime  = time.Unix(1668802887, 0)
-	testMsg   = "test message"
-	testLevel = level.Info
+	testTime              = time.Unix(1668802887, 0)
+	testMsg               = "test message"
+	testLevel             = level.Info
+	testNilString *string = nil
 
 	ta1 = attr.String("a_key", "value")
 	ta2 = attr.Int("b_test_no", 1)
@@ -29,6 +30,8 @@ var (
 	taNest = attr.New("namespace", []attr.Attr{
 		ta3, ta4,
 	})
+	ta6      = attr.NewPtr("f_string_pointer", &testMsg)
+	ta6unset = attr.NewPtr("g_string_pointer_nil", testNilString)
 
 	testAttrs = []attr.Attr{
 		ta1, ta2, ta3, ta4,
@@ -39,6 +42,8 @@ var (
 	r3 = records.New(testTime, testLevel, testMsg, testAttrs...)
 	r4 = records.New(testTime, testLevel, testMsg, ta1, ta2, taNest)
 	r5 = records.New(testTime, testLevel, testMsg, ta5)
+	r6 = records.New(testTime, testLevel, testMsg, ta6)
+	r7 = records.New(testTime, testLevel, testMsg, ta6unset)
 )
 
 func TestNew(t *testing.T) {
@@ -65,7 +70,8 @@ func TestHandle(t *testing.T) {
 
 	t.Run("Simple", func(t *testing.T) {
 		b.Reset()
-		wants := `[2022-11-18T21:21:27+01:00] [info] test message`
+		wants := `[2022-11-18T21:21:27+01:00] [info] test message
+`
 
 		err := h.Handle(r1)
 		if err != nil {
@@ -79,7 +85,8 @@ func TestHandle(t *testing.T) {
 	})
 	t.Run("WithAttribute", func(t *testing.T) {
 		b.Reset()
-		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ a_key: value ]`
+		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ a_key: value ]
+`
 
 		err := h.Handle(r2)
 		if err != nil {
@@ -93,7 +100,8 @@ func TestHandle(t *testing.T) {
 	})
 	t.Run("WithAttributes", func(t *testing.T) {
 		b.Reset()
-		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ a_key: value ; b_test_no: 1 ; c_success_rate: 1 ; d_custom: {custom_key 2} ]`
+		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ a_key: value ; b_test_no: 1 ; c_success_rate: 1 ; d_custom: {custom_key 2} ]
+`
 
 		err := h.Handle(r3)
 		if err != nil {
@@ -107,9 +115,40 @@ func TestHandle(t *testing.T) {
 	})
 	t.Run("WithSliceAttribute", func(t *testing.T) {
 		b.Reset()
-		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ e_slice: [a b c] ]`
+		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ e_slice: [a b c] ]
+`
 
 		err := h.Handle(r5)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		out := b.String()
+		if wants != out {
+			t.Errorf("output mismatch error: wanted %s ; got %s", wants, out)
+		}
+	})
+	t.Run("PointerAttr", func(t *testing.T) {
+		b.Reset()
+		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ f_string_pointer: test message ]
+`
+
+		err := h.Handle(r6)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		out := b.String()
+		if wants != out {
+			t.Errorf("output mismatch error: wanted %s ; got %s", wants, out)
+		}
+	})
+	t.Run("NilPointerAttr", func(t *testing.T) {
+		b.Reset()
+		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ g_string_pointer_nil: <nil> ]
+`
+
+		err := h.Handle(r7)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -134,7 +173,8 @@ func TestHandle(t *testing.T) {
 		}
 	})
 	t.Run("LevelHandlerAttr", func(t *testing.T) {
-		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ k: v ; a_key: value ; b_test_no: 1 ; c_success_rate: 1 ; d_custom: {custom_key 2} ]`
+		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ k: v ; a_key: value ; b_test_no: 1 ; c_success_rate: 1 ; d_custom: {custom_key 2} ]
+`
 		newH := h.With(attr.New("k", "v"))
 
 		err := newH.Handle(r3)
@@ -149,7 +189,8 @@ func TestHandle(t *testing.T) {
 	})
 	t.Run("WithNamespaceAttr", func(t *testing.T) {
 		b.Reset()
-		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ a_key: value ; b_test_no: 1 ; namespace: [ c_success_rate: 1 ; d_custom: {custom_key 2} ] ]`
+		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ a_key: value ; b_test_no: 1 ; namespace: [ c_success_rate: 1 ; d_custom: {custom_key 2} ] ]
+`
 
 		err := h.Handle(r4)
 		if err != nil {
@@ -163,7 +204,8 @@ func TestHandle(t *testing.T) {
 	})
 	t.Run("WithReplFn", func(t *testing.T) {
 		b.Reset()
-		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ a_key: val ]`
+		wants := `[2022-11-18T21:21:27+01:00] [info] test message [ a_key: val ]
+`
 
 		newH := h.WithReplaceFn(func(a attr.Attr) attr.Attr {
 			if a.Key() == "a_key" {
