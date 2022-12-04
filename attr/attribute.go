@@ -1,5 +1,9 @@
 package attr
 
+import (
+	json "github.com/goccy/go-json"
+)
+
 // Attr interface describes the behavior that a serializable attribute
 // should have.
 //
@@ -18,6 +22,8 @@ type Attr interface {
 	// nil
 	WithValue(value any) Attr
 }
+
+type Attrs []Attr
 
 // New is a generic function to create an Attr
 //
@@ -72,6 +78,20 @@ func (a attr[T]) WithValue(value any) Attr {
 	return New(a.key, v)
 }
 
+// MarshalJSON encodes the attribute as a JSON object (key-value pair)
+func (a attr[T]) MarshalJSON() ([]byte, error) {
+	var kv = map[string]any{}
+	kv[a.Key()] = a.Value()
+
+	return json.Marshal(kv)
+}
+
+// String implements fmt.Stringer
+func (a attr[T]) String() string {
+	b, _ := a.MarshalJSON()
+	return string(b)
+}
+
 // Ptr is a generic function to create an Attr from a pointer value
 //
 // Using a generic approach allows the Attr.WithValue method to be
@@ -123,4 +143,34 @@ func (p *ptrAttr[T]) WithValue(value any) Attr {
 		return nil
 	}
 	return Ptr(p.key, v)
+}
+
+// MarshalJSON encodes the attribute as a JSON object (key-value pair)
+func (p *ptrAttr[T]) MarshalJSON() ([]byte, error) {
+	var kv = map[string]any{}
+	kv[p.Key()] = p.Value()
+
+	return json.Marshal(kv)
+}
+
+// String implements fmt.Stringer
+func (p *ptrAttr[T]) String() string {
+	b, _ := p.MarshalJSON()
+	return string(b)
+}
+
+// MarshalJSON encodes the attributes as a JSON object (key-value pairs)
+func (attrs Attrs) MarshalJSON() ([]byte, error) {
+	var kv = map[string]any{}
+	for _, a := range attrs {
+		kv[a.Key()] = a.Value()
+	}
+
+	return json.Marshal(kv)
+}
+
+// String implements fmt.Stringer
+func (attrs Attrs) String() string {
+	b, _ := attrs.MarshalJSON()
+	return string(b)
 }
