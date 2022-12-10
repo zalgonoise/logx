@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/zalgonoise/logx/attr"
+	"github.com/zalgonoise/attr"
 	"github.com/zalgonoise/logx/handlers/jsonh"
 	"github.com/zalgonoise/logx/handlers/texth"
 	"github.com/zalgonoise/logx/level"

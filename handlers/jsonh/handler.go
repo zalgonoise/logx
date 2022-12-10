@@ -6,7 +6,7 @@ import (
 	"time"
 
 	json "github.com/goccy/go-json"
-	"github.com/zalgonoise/logx/attr"
+	"github.com/zalgonoise/attr"
 	"github.com/zalgonoise/logx/handlers"
 	"github.com/zalgonoise/logx/level"
 	"github.com/zalgonoise/logx/records"

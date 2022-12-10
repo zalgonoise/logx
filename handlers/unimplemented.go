@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/zalgonoise/logx/attr"
+	"github.com/zalgonoise/attr"
 	"github.com/zalgonoise/logx/level"
 	"github.com/zalgonoise/logx/records"
 )

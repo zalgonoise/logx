@@ -6,8 +6,8 @@ import (
 	"os"
 	"runtime/pprof"
 
+	"github.com/zalgonoise/attr"
 	log "github.com/zalgonoise/logx"
-	"github.com/zalgonoise/logx/attr"
 	"github.com/zalgonoise/logx/handlers/texth"
 )
 
