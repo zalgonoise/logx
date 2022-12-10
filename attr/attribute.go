@@ -174,7 +174,14 @@ func (p *ptrAttr[T]) WithValue(value any) Attr {
 // MarshalJSON encodes the attribute as a JSON object (key-value pair)
 func (p *ptrAttr[T]) MarshalJSON() ([]byte, error) {
 	var kv = map[string]any{}
-	kv[p.Key()] = p.Value()
+	switch v := p.Value().(type) {
+	case []Attr:
+		kv[p.Key()] = mapAttrs(v...)
+	case Attr:
+		kv[p.Key()] = mapAttrs(v)
+	default:
+		kv[p.Key()] = p.Value()
+	}
 
 	return json.Marshal(kv)
 }
@@ -189,7 +196,14 @@ func (p *ptrAttr[T]) String() string {
 func (attrs Attrs) MarshalJSON() ([]byte, error) {
 	var kv = map[string]any{}
 	for _, a := range attrs {
-		kv[a.Key()] = a.Value()
+		switch v := a.Value().(type) {
+		case []Attr:
+			kv[a.Key()] = mapAttrs(v...)
+		case Attr:
+			kv[a.Key()] = mapAttrs(v)
+		default:
+			kv[a.Key()] = a.Value()
+		}
 	}
 
 	return json.Marshal(kv)
