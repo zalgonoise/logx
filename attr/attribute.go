@@ -81,7 +81,16 @@ func (a attr[T]) WithValue(value any) Attr {
 // MarshalJSON encodes the attribute as a JSON object (key-value pair)
 func (a attr[T]) MarshalJSON() ([]byte, error) {
 	var kv = map[string]any{}
-	kv[a.Key()] = a.Value()
+	switch v := a.Value().(type) {
+	case []Attr:
+		kv[a.Key()] = (Attrs)(v)
+	case Attr:
+		kv[a.Key()] = map[string]any{
+			v.Key(): v.Value(),
+		}
+	default:
+		kv[a.Key()] = a.Value()
+	}
 
 	return json.Marshal(kv)
 }
